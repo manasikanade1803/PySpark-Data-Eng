@@ -1,0 +1,157 @@
+Creating Spark Project Build Configuration:
+-Pycharm development IDE is being used here.
+-It is recommended by Instructor to install Anaconda Python On Your Machine
+-Also download and set spark binaries and set spark home with environment variables.
+-Your Spark home should point to the correct version of spark binaries.
+-ie. The latest version.
+-OR it depends on your cluster version.
+-If your cluster is at version 2.4.5 and you are developing the application to submit at the cluster then you have to choose the version accordingly.
+-Once the spark version is confirmed make sure that your spark binaries are also at the same version.
+-And your spark home is pointing to the same.
+-Prerequisites Listed: 
+Anaconda Platform
+PyCharm
+Spark Binaries
+SPARK_HOME
+HADOOP_HOME (pointing to winutils)
+
+
+
+-Open Pycharm IDE , Create New project.
+-CHoose Python Interpreter : New COnda environment
+-Click on “Create” , wait for project to be created.
+-Go to FIles->Settings→ look for project name→Select the Project Interpreter from list→Add pyspark (make sure u are selecting correct version)
+-This version must match with your spark home
+-No program is complete without unit testing, so add Pytest.
+To Create a new program:
+-Write click on project→New→Python File
+-”from pyspark import *” you will need this code line everywhere.
+
+Configuring Spark Project Application Logs:
+
+-Spark project is using Log4j and we also want to use the same for our applications.
+-Using Log4j:
+Create a log4j configuration file
+Configure Spark JVM to pick up the log4j configuration file.
+Create a Python Class to get spark’s Log4j instance and use it.
+-Skipping Logging with Log4j in notes here.
+Creating Spark Session:
+-We already learnt that every spark program will start the Driver , and then driver will start the executors for doing most of the work.
+-So first thing in spark program is to create the spark session object which is your Driver.
+-When you writing the spark program , u need to write spark session as it is not already provided.
+-Spark session is the singleton object so any spark program can have one and only one spark object.
+-
+from pyspark.sql  import * 
+If __name__ == “__main__”:
+       spark = SaprkSession().builder \
+       .getOrCreate()
+
+-SparkSession object is your driver and you cannot have more than one driver in a program.
+-Spark is a highly configurable system, hence our spark session is also highly configurable.
+-”master”,”appName” are the most commonly used configs by almost every application.
+-”config” is an overloaded config methods for other configuration.
+-
+from pyspark.sql  import * 
+If __name__ == “__main__”:
+       spark = SaprkSession().builder \
+       .appName(“Hello Spark”) \
+       .master(“local[3]”) \
+       .getOrCreate()
+
+       spark.stop()
+-Cluster manager configs is defined as “master” , here local multithreaded JVM is used with 3 threads.
+-We should stop the driver once the spark program is run successfully.
+-need to create log4j class. Skipped the explanation here.
+-app-logs directory will have log entries for spark program only and not for excessive logs such as cluster or etc.
+Quiz:5
+
+SaprkSession : 
+Is an entry point to Programming Spark
+Can be created using SparkSession.builder()
+Both 1 & 2
+None of these.
+
+A sparkContext : 
+Represents the connection to a spark cluster
+Can be used to get SparkConf object
+Was an entry point to Programming Spark  in older versions
+All of the above
+
+SparkConf : 
+Is used to get/set various Spark parameters as a key-value pairs
+Can be retrieved from your spark session using spark.Context.getConf()
+You can create a SaprkConf() that loads defaults from system properties and the classpath.
+Setting values to SparkConf directly takes priority over system properties.
+All of the above.
+
+You can set the configuration to your Spark application.
+Using spark-submit command line options.
+Setting an environment variable on the machine where you run spark-submit.
+Using SPARK_HOME/conf/spark-defaults.conf on the machine where you run spark-submit.
+Setting key/value pair to SparkConf object in your application code.
+All of the above.
+
+Following Spark application configuration precedence is correct
+Environment variable -> spark-submit command line -> SparkConf -> spark-defaults.conf
+Spark-submit command line -> environment variable -> spark-defaults.conf->SparkConf
+environment variable -> Spark-submit command line-> spark-defaults.conf->SparkConf
+environment variable -> spark-defaults.conf->Spark-submit command line-> SparkConf
+Configuring Spark Session : 
+-Apache Spark is a highly configurable system
+-Spark allows us to set those configurations using 4 distinct methods.
+Environment Variables
+SPARK_HOME/conf/spark-defaults.conf
+Spark-submit command-line options.
+SparkConf Object
+-If you have space in your configs then you must enclose it with “”,otherwise will face the error.
+-
+from pyspark.sql  import * 
+If __name__ == “__main__”:
+conf = SparkConf() 
+conf.set(“spark.app.name”,”Hello Spark”)
+conf.set(“Spark.master”,”local[3]”)
+
+
+       spark = SaprkSession().builder \
+       .config(conf=conf) \
+          .getOrCreate()
+
+       spark.stop()
+
+-So In this way we can pass the config to spark session using “config()” function.
+-
+-All these initial configs can be overwritten by you with the “Application Code” as application code parameters have 1st preference.
+-So , When to use which method? Here is the thumb rule.
+-Leave your cluster configuration from Environment Variables & Default .Conf for your cluster admins.
+-Do not make your applications dependent on these 2 methods for setting configurations.
+-So we should either use a command line or spark conf.
+-Further, Spark properties can be grouped into 2 types / categories.
+Deployment Related COnfigs:
+Driver.memory
+executor.instances
+      We often set them through the command line and not from the application code / application.
+Run Time Behaviour:
+task.maxFailures
+shuffle.partitions
+    We often set them through spark confs ie. Through application code.
+
+-Also , we should not hardcode the config settings in our spark application, What we can do is, we can keep these configurations in separate files and use them at runtime.
+-we can create the file “spark.conf” to keep our configurations listed there.
+-in “lib” package / folder , u need to create a new python file to import or configure the configurations set.
+Data Frame Introduction: 
+-Spark is typical data processing system , and in any data processing system, 3 steps are common : Read , Process , Write.
+-spark.read is object which allows us to read data from variety of sources such as csv, json etc.
+-as we have stet the file path as parameters in conf. File, we can use it as : 
+Survey_df = spark.read.csv(sys.argv[1])
+-before using “.csv” we can provide options as “.option()” by passing the parameters in key value pair. Like headers is available or not.
+-Spark dataframe is  2d table with well defined schema, structured data inspired by Pandas.
+-ie. Each column have specific data type.
+-Write function to reuse pyspark code to use in main method.
+Data Frame Partitions and Executors:
+
+
+
+
+
+
+
